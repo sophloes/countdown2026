@@ -1,0 +1,248 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; min-height: 100vh; }
+
+  .bg {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #1a0533;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+  }
+  .b1 { width: 420px; height: 420px; background: #7c3aed; top: -80px; left: -80px; }
+  .b2 { width: 360px; height: 360px; background: #db2777; bottom: -60px; right: -60px; }
+  .b3 { width: 280px; height: 280px; background: #0ea5e9; bottom: 20%; left: 10%; }
+  .b4 { width: 200px; height: 200px; background: #f59e0b; top: 30%; right: 5%; }
+
+  .noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    backdrop-filter: blur(32px) saturate(1.8);
+    -webkit-backdrop-filter: blur(32px) saturate(1.8);
+    text-align: center;
+    color: #fff;
+  }
+
+  .tagline {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1.8rem;
+  }
+
+  .date-picker-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .date-picker-wrap label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  input[type=date] {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 15px;
+    padding: 10px 18px;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+    max-width: 220px;
+    text-align: center;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.6); cursor: pointer; }
+  input[type=date]:focus { background: rgba(255,255,255,0.16); }
+
+  .big-num {
+    font-size: 100px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+    background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .num-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.06em;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+  }
+
+  .progress-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .msg { font-size: 20px; font-weight: 600; margin-bottom: 0.4rem; }
+  .submsg { font-size: 14px; color: rgba(255,255,255,0.55); }
+
+  .pill-row {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 1.8rem;
+  }
+  .pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 99px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    padding: 5px 14px;
+  }
+
+  .hidden { display: none; }
+  .placeholder { font-size: 14px; color: rgba(255,255,255,0.4); padding: 1.5rem 0; }
+</style>
+
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+  <div class="noise"></div>
+
+  <div class="card">
+    <div class="tagline">Freedom countdown</div>
+
+    <div class="date-picker-wrap">
+      <label for="qdate">Your last day at work</label>
+      <input type="date" id="qdate" />
+    </div>
+
+    <div id="result" class="hidden">
+      <div class="pill-row" id="pillrow"></div>
+      <div class="big-num" id="bignum">0</div>
+      <div class="num-label" id="numlabel">weekdays to go</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="pbar"></div>
+      </div>
+      <div class="progress-label" id="plabel"></div>
+      <hr class="divider" />
+      <div class="msg" id="msg"></div>
+      <div class="submsg" id="submsg"></div>
+    </div>
+
+    <div id="placeholder" class="placeholder">Pick your quit date to ignite the countdown.</div>
+  </div>
+</div>
+
+<script>
+function weekdaysBetween(a, b) {
+  let count = 0, cur = new Date(a); cur.setHours(0,0,0,0);
+  const end = new Date(b); end.setHours(0,0,0,0);
+  if (cur >= end) return 0;
+  while (cur < end) { const d = cur.getDay(); if (d && d < 6) count++; cur.setDate(cur.getDate()+1); }
+  return count;
+}
+
+const msgs = [
+  [0,   "You're free!!",       "Go celebrate. You did it."],
+  [1,   "Last day tomorrow!",  "Make it count — then bounce."],
+  [5,   "One week left!",      "Start drafting that resignation speech."],
+  [10,  "Single digits soon!", "The finish line is right there."],
+  [20,  "So close!",           "Time to clean out that desk drawer."],
+  [50,  "Counting down!",      "Every Monday brings you closer."],
+  [100, "Hang tight!",         "The days are flying by."],
+  [Infinity, "The journey begins!", "Every day crossed off is a win."]
+];
+
+function getMsg(n) { for (const [t,m,s] of msgs) if (n <= t) return [m,s]; return msgs[msgs.length-1].slice(1); }
+
+function barColor(pct) {
+  if (pct > 0.65) return 'linear-gradient(90deg,#f43f5e,#fb7185)';
+  if (pct > 0.35) return 'linear-gradient(90deg,#f59e0b,#fcd34d)';
+  return 'linear-gradient(90deg,#10b981,#34d399)';
+}
+
+function makePills(remaining, quit) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const ms = quit - today;
+  const calDays = Math.max(0, Math.ceil(ms / 86400000));
+  const weeks = Math.floor(remaining / 5);
+  const months = quit.getMonth() - today.getMonth() + 12*(quit.getFullYear()-today.getFullYear());
+  const items = [`${calDays} calendar days`, `~${weeks} work weeks`];
+  if (months > 0) items.push(`${months} month${months>1?'s':''}`);
+  return items;
+}
+
+document.getElementById('qdate').addEventListener('change', function() {
+  const val = this.value; if (!val) return;
+  const quit = new Date(val + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const remaining = weekdaysBetween(today, quit);
+  const total = weekdaysBetween(new Date(today.getFullYear(),0,1), quit);
+  const pct = total > 0 ? remaining / total : 0;
+
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('placeholder').classList.add('hidden');
+
+  document.getElementById('bignum').textContent = remaining;
+  document.getElementById('numlabel').textContent = remaining === 1 ? 'weekday to go' : remaining === 0 ? '— you made it!' : 'weekdays to go';
+
+  const pbar = document.getElementById('pbar');
+  pbar.style.width = Math.round(pct * 100) + '%';
+  pbar.style.background = barColor(pct);
+
+  const pctDone = total > 0 ? Math.round(((total - remaining) / total) * 100) : 100;
+  document.getElementById('plabel').textContent = pctDone + '% of the way there since Jan 1';
+
+  const [m, s] = getMsg(remaining);
+  document.getElementById('msg').textContent = m;
+  document.getElementById('submsg').textContent = s;
+
+  const pillrow = document.getElementById('pillrow');
+  pillrow.innerHTML = makePills(remaining, quit).map(p => `<span class="pill">${p}</span>`).join('');
+});
+</script>
