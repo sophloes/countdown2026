@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; min-height: 100vh; }
@@ -15,12 +16,12 @@
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    opacity: 0.55;
+    opacity: 0.45;
   }
-  .b1 { width: 420px; height: 420px; background: #7c3aed; top: -80px; left: -80px; }
-  .b2 { width: 360px; height: 360px; background: #db2777; bottom: -60px; right: -60px; }
-  .b3 { width: 280px; height: 280px; background: #0ea5e9; bottom: 20%; left: 10%; }
-  .b4 { width: 200px; height: 200px; background: #f59e0b; top: 30%; right: 5%; }
+  .b1 { width: 70vw; height: 70vw; background: #7c3aed; top: -25vw; left: -25vw; }
+  .b2 { width: 65vw; height: 65vw; background: #db2777; bottom: -25vw; right: -25vw; }
+  .b3 { width: 50vw; height: 50vw; background: #0ea5e9; bottom: 10%; left: 5%; }
+  .b4 { width: 40vw; height: 40vw; background: #f59e0b; top: 25%; right: 0%; }
 
   .noise {
     position: absolute; inset: 0;
@@ -83,7 +84,7 @@
   input[type=date]:focus { background: rgba(255,255,255,0.16); }
 
   .big-num {
-    font-size: 100px;
+    font-size: clamp(60px, 20vw, 100px);
     font-weight: 700;
     line-height: 1;
     margin-bottom: 0.3rem;
