@@ -52,37 +52,6 @@
     margin-bottom: 1.8rem;
   }
 
-  .date-picker-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2rem;
-  }
-
-  .date-picker-wrap label {
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-  }
-
-  input[type=date] {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.22);
-    border-radius: 14px;
-    color: #fff;
-    font-size: 15px;
-    padding: 10px 18px;
-    outline: none;
-    cursor: pointer;
-    width: 100%;
-    max-width: 220px;
-    text-align: center;
-    font-family: inherit;
-    transition: background 0.2s;
-  }
-  input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.6); cursor: pointer; }
-  input[type=date]:focus { background: rgba(255,255,255,0.16); }
-
   .big-num {
     font-size: clamp(60px, 20vw, 100px);
     font-weight: 700;
@@ -142,9 +111,6 @@
     color: rgba(255,255,255,0.7);
     padding: 5px 14px;
   }
-
-  .hidden { display: none; }
-  .placeholder { font-size: 14px; color: rgba(255,255,255,0.4); padding: 1.5rem 0; }
 </style>
 
 <div class="bg">
@@ -156,26 +122,16 @@
 
   <div class="card">
     <div class="tagline">Freedom countdown</div>
-
-    <div class="date-picker-wrap">
-      <label for="qdate">Your last day at work</label>
-      <input type="date" id="qdate" />
+    <div class="pill-row" id="pillrow"></div>
+    <div class="big-num" id="bignum"></div>
+    <div class="num-label" id="numlabel"></div>
+    <div class="progress-track">
+      <div class="progress-fill" id="pbar"></div>
     </div>
-
-    <div id="result" class="hidden">
-      <div class="pill-row" id="pillrow"></div>
-      <div class="big-num" id="bignum">0</div>
-      <div class="num-label" id="numlabel">weekdays to go</div>
-      <div class="progress-track">
-        <div class="progress-fill" id="pbar"></div>
-      </div>
-      <div class="progress-label" id="plabel"></div>
-      <hr class="divider" />
-      <div class="msg" id="msg"></div>
-      <div class="submsg" id="submsg"></div>
-    </div>
-
-    <div id="placeholder" class="placeholder">Pick your quit date to ignite the countdown.</div>
+    <div class="progress-label" id="plabel"></div>
+    <hr class="divider" />
+    <div class="msg" id="msg"></div>
+    <div class="submsg" id="submsg"></div>
   </div>
 </div>
 
@@ -200,54 +156,37 @@ const msgs = [
 ];
 
 function getMsg(n) { for (const [t,m,s] of msgs) if (n <= t) return [m,s]; return msgs[msgs.length-1].slice(1); }
-
 function barColor(pct) {
   if (pct > 0.65) return 'linear-gradient(90deg,#f43f5e,#fb7185)';
   if (pct > 0.35) return 'linear-gradient(90deg,#f59e0b,#fcd34d)';
   return 'linear-gradient(90deg,#10b981,#34d399)';
 }
 
-function makePills(remaining, quit) {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const ms = quit - today;
-  const calDays = Math.max(0, Math.ceil(ms / 86400000));
-  const weeks = Math.floor(remaining / 5);
-  const months = quit.getMonth() - today.getMonth() + 12*(quit.getFullYear()-today.getFullYear());
-  const items = [`${calDays} calendar days`, `~${weeks} work weeks`];
-  if (months > 0) items.push(`${months} month${months>1?'s':''}`);
-  return items;
-}
+const QUIT = '2026-06-15';
+const quit = new Date(QUIT + 'T00:00:00');
+const today = new Date(); today.setHours(0,0,0,0);
+const remaining = weekdaysBetween(today, quit);
+const total = weekdaysBetween(new Date(today.getFullYear(),0,1), quit);
+const pct = total > 0 ? remaining / total : 0;
 
-const saved = localStorage.getItem('quitDate');
-if (saved) { document.getElementById('qdate').value = saved; document.getElementById('qdate').dispatchEvent(new Event('change')); }
+document.getElementById('bignum').textContent = remaining;
+document.getElementById('numlabel').textContent = remaining === 1 ? 'weekday to go' : remaining === 0 ? '— you made it!' : 'weekdays to go';
 
-document.getElementById('qdate').addEventListener('change', function() {
-  localStorage.setItem('quitDate', this.value);
-  const val = this.value; if (!val) return;
-  const quit = new Date(val + 'T00:00:00');
-  const today = new Date(); today.setHours(0,0,0,0);
-  const remaining = weekdaysBetween(today, quit);
-  const total = weekdaysBetween(new Date(today.getFullYear(),0,1), quit);
-  const pct = total > 0 ? remaining / total : 0;
+const pbar = document.getElementById('pbar');
+pbar.style.width = Math.round(pct * 100) + '%';
+pbar.style.background = barColor(pct);
 
-  document.getElementById('result').classList.remove('hidden');
-  document.getElementById('placeholder').classList.add('hidden');
+const pctDone = total > 0 ? Math.round(((total - remaining) / total) * 100) : 100;
+document.getElementById('plabel').textContent = pctDone + '% of the way there since Jan 1';
 
-  document.getElementById('bignum').textContent = remaining;
-  document.getElementById('numlabel').textContent = remaining === 1 ? 'weekday to go' : remaining === 0 ? '— you made it!' : 'weekdays to go';
+const [m, s] = getMsg(remaining);
+document.getElementById('msg').textContent = m;
+document.getElementById('submsg').textContent = s;
 
-  const pbar = document.getElementById('pbar');
-  pbar.style.width = Math.round(pct * 100) + '%';
-  pbar.style.background = barColor(pct);
-
-  const pctDone = total > 0 ? Math.round(((total - remaining) / total) * 100) : 100;
-  document.getElementById('plabel').textContent = pctDone + '% of the way there since Jan 1';
-
-  const [m, s] = getMsg(remaining);
-  document.getElementById('msg').textContent = m;
-  document.getElementById('submsg').textContent = s;
-
-  const pillrow = document.getElementById('pillrow');
-  pillrow.innerHTML = makePills(remaining, quit).map(p => `<span class="pill">${p}</span>`).join('');
-});
+const calDays = Math.max(0, Math.ceil((quit - today) / 86400000));
+const weeks = Math.floor(remaining / 5);
+const months = quit.getMonth() - today.getMonth() + 12*(quit.getFullYear()-today.getFullYear());
+const pills = [`${calDays} calendar days`, `~${weeks} work weeks`];
+if (months > 0) pills.push(`${months} month${months>1?'s':''}`);
+document.getElementById('pillrow').innerHTML = pills.map(p => `<span class="pill">${p}</span>`).join('');
 </script>
