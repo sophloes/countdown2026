@@ -122,6 +122,7 @@
 
   <div class="card">
     <div class="tagline">Freedom countdown</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.4); margin-bottom:1.2rem;">June 15, 2026</div>
     <div class="pill-row" id="pillrow"></div>
     <div class="big-num" id="bignum"></div>
     <div class="num-label" id="numlabel"></div>
@@ -177,7 +178,8 @@ pbar.style.width = Math.round(pct * 100) + '%';
 pbar.style.background = barColor(pct);
 
 const pctDone = total > 0 ? Math.round(((total - remaining) / total) * 100) : 100;
-document.getElementById('plabel').textContent = pctDone + '% of the way there since Jan 1';
+const elapsed = weekdaysBetween(new Date(today.getFullYear(),0,1), today);
+document.getElementById('plabel').textContent = pctDone + '% of the way there · ' + elapsed + ' weekdays since Jan 1';
 
 const [m, s] = getMsg(remaining);
 document.getElementById('msg').textContent = m;
