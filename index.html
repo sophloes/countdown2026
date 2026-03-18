@@ -218,7 +218,11 @@ function makePills(remaining, quit) {
   return items;
 }
 
+const saved = localStorage.getItem('quitDate');
+if (saved) { document.getElementById('qdate').value = saved; document.getElementById('qdate').dispatchEvent(new Event('change')); }
+
 document.getElementById('qdate').addEventListener('change', function() {
+  localStorage.setItem('quitDate', this.value);
   const val = this.value; if (!val) return;
   const quit = new Date(val + 'T00:00:00');
   const today = new Date(); today.setHours(0,0,0,0);
